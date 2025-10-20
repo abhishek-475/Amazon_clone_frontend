@@ -1,40 +1,79 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { auth, googleProvider } from "../firebase";
+import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../firebase";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  const handleGoogleSignup = async () => {
+    setError("");
+    setLoading(true);
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+
+      const user = auth.currentUser;
+      await fetch("https://amazon-clone-backend-1-s6de.onrender.com/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: user.displayName || "Anonymous",
+          email: user.email,
+          googleId: user.providerData[0]?.uid || "",
+          authProvider: "google",
+        }),
+      });
+
+      navigate("/"); // redirect to home
+    } catch (err) {
+      console.error("Google signup failed:", err);
+      setError("Google signup failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleEmailSignup = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      alert("Passwords don't match");
+      setError("Passwords don't match");
       return;
     }
+    setError("");
+    setLoading(true);
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      navigate("/");
-    } catch (error) {
-      alert(error.message);
-    }
-  };
 
-  const handleGoogleSignup = async () => {
-    try {
-      await signInWithPopup(auth, googleProvider);
-      navigate("/");
-    } catch (error) {
-      alert(error.message);
+      const user = auth.currentUser;
+      await fetch("https://amazon-clone-backend-1-s6de.onrender.com/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: user.displayName || "Anonymous",
+          email: user.email,
+          googleId: "",
+          authProvider: "email",
+        }),
+      });
+
+      navigate("/"); // redirect to home
+    } catch (err) {
+      console.error("Email signup failed:", err);
+      setError("Signup failed. Try another email.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-4 mt-5">
-      {/* Amazon Logo */}
+      {/* Logo */}
       <div className="flex items-center mb-6">
         <img
           src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
@@ -48,8 +87,9 @@ const Signup = () => {
       <div className="border border-gray-300 rounded-md w-full max-w-md bg-white p-6 shadow-sm">
         <h1 className="text-2xl font-semibold mb-4">Create Account</h1>
 
+        {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
+
         <form onSubmit={handleEmailSignup}>
-          {/* Email */}
           <label className="text-sm font-semibold block mb-1">Email</label>
           <input
             type="email"
@@ -59,7 +99,6 @@ const Signup = () => {
             required
           />
 
-          {/* Password */}
           <label className="text-sm font-semibold block mb-1">Password</label>
           <input
             type="password"
@@ -69,10 +108,7 @@ const Signup = () => {
             required
           />
 
-          {/* Confirm Password */}
-          <label className="text-sm font-semibold block mb-1">
-            Re-enter Password
-          </label>
+          <label className="text-sm font-semibold block mb-1">Re-enter Password</label>
           <input
             type="password"
             value={confirmPassword}
@@ -81,44 +117,19 @@ const Signup = () => {
             required
           />
 
-          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-yellow-400 hover:bg-yellow-500 text-sm font-medium py-2 rounded-sm"
+            disabled={loading}
+            className={`w-full ${loading ? "bg-gray-400" : "bg-yellow-400 hover:bg-yellow-500"} text-sm font-medium py-2 rounded-sm transition-colors`}
           >
-            Continue
+            {loading ? "Creating Account..." : "Continue"}
           </button>
         </form>
 
-
-        <div className="mt-4 text-sm">
-          <p className="text-gray-800 font-semibold">Buying for work?</p>
-          <Link to='/business-account' className="text-blue-600 hover:underline cursor-pointer">
-            Create a free business account
-          </Link>
+        <div className="mt-4 text-sm text-gray-800">
+          Already have an account?{" "}
+          <Link to="/login" className="text-blue-600 hover:underline">Sign in</Link>
         </div>
-
-         <div className="flex-grow h-px bg-gray-300 mt-4"></div>
-
-           {/* Already have account */}
-      <div className="mt-4 text-sm text-gray-800">
-        Already have an account?{" "}
-        <Link to="/login" className="text-blue-600 hover:underline">
-          Sign in
-        </Link>
-      </div>
-      {/* Info Section */}
-        <p className="text-xs text-gray-800 mt-4">
-          By creating an account, you agree to Amazon's{" "}
-          <span className="text-blue-600 hover:underline cursor-pointer">
-            Conditions of Use
-          </span>{" "}
-          and{" "}
-          <span className="text-blue-600 hover:underline cursor-pointer">
-            Privacy Notice
-          </span>
-          .
-        </p>
       </div>
 
       {/* Divider */}
@@ -128,38 +139,19 @@ const Signup = () => {
         <div className="flex-grow h-px bg-gray-300"></div>
       </div>
 
-    
-
       {/* Google Signup */}
       <button
         onClick={handleGoogleSignup}
-        className="w-full max-w-md mt-3 flex items-center justify-center border border-gray-400 rounded-sm py-2 hover:bg-gray-100"
+        disabled={loading}
+        className={`w-full max-w-md mt-3 flex items-center justify-center border border-gray-400 rounded-sm py-2 ${loading ? "bg-gray-100" : "hover:bg-gray-100"} transition-colors`}
       >
         <img
           src="https://www.svgrepo.com/show/475656/google-color.svg"
           alt="Google"
           className="w-5 h-5 mr-2"
         />
-        <span className="text-sm">Sign up with Google</span>
+        <span className="text-sm">{loading ? "Signing up..." : "Sign up with Google"}</span>
       </button>
-
-     
-
-      {/* Footer */}
-      <footer className="mt-12 text-xs text-center">
-        <div className="flex justify-center space-x-6 text-blue-600">
-          <span className="hover:underline cursor-pointer">
-            Conditions of Use
-          </span>
-          <span className="hover:underline cursor-pointer">
-            Privacy Notice
-          </span>
-          <span className="hover:underline cursor-pointer">Help</span>
-        </div>
-        <p className="mt-2 text-gray-500">
-          © 1996-2024, Amazon.com, Inc. or its affiliates
-        </p>
-      </footer>
     </div>
   );
 };

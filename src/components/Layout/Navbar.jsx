@@ -1,8 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import AccountPopup from '../AccountPopup';
 import DropKitchen from '../Menus/DropKitchen';
+import { auth } from '../../firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 
 const Navbar = () => {
   const cart = useSelector(state => state.cart);
@@ -10,6 +12,9 @@ const Navbar = () => {
 
   const [showAccountPopup, setShowAccountPopup] = useState(false);
   const [showKitchenMenu, setShowKitchenMenu] = useState(false);
+  const [user, setUser] = useState(null);
+  const [showLocationInput, setShowLocationInput] = useState(false);
+  const [location, setLocation] = useState(localStorage.getItem('location') || '');
 
   const accountRef = useRef(null);
   const popupRef = useRef(null);
@@ -18,6 +23,18 @@ const Navbar = () => {
 
   const accountHoverTimeout = useRef(null);
   const kitchenHoverTimeout = useRef(null);
+
+  // Track Firebase auth state
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+      } else {
+        setUser(null);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Handle hover for Account popup
   const handleAccountMouseEnter = () => {
@@ -37,6 +54,19 @@ const Navbar = () => {
     kitchenHoverTimeout.current = setTimeout(() => setShowKitchenMenu(false), 200);
   };
 
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Sign Out Error:', error);
+    }
+  };
+
+  const saveLocation = () => {
+    localStorage.setItem('location', location);
+    setShowLocationInput(false);
+  };
+
   return (
     <>
       {/* Top Navigation Bar */}
@@ -53,16 +83,36 @@ const Navbar = () => {
             </Link>
 
             {/* Delivery Location */}
-            <div className="flex items-center p-2 hover:border hover:border-white hover:rounded cursor-pointer">
+            <div className="flex items-center p-2 hover:border hover:border-white hover:rounded cursor-pointer relative">
               <div className="flex flex-col">
                 <span className="text-xs text-gray-300 leading-3">Delivering to</span>
-                <span className="text-sm font-bold flex items-center gap-1">
+                <span
+                  className="text-sm font-bold flex items-center gap-1"
+                  onClick={() => setShowLocationInput(!showLocationInput)}
+                >
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                   </svg>
-                  Update location
+                  {location || 'Update location'}
                 </span>
               </div>
+              {showLocationInput && (
+                <div className="absolute top-full left-0 mt-1 p-2 bg-white text-black rounded shadow-md z-50">
+                  <input
+                    type="text"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="Enter city or pincode"
+                    className="border border-gray-300 rounded p-1 text-sm w-48"
+                  />
+                  <button
+                    onClick={saveLocation}
+                    className="ml-2 bg-yellow-400 hover:bg-yellow-500 text-black px-2 py-1 text-sm rounded"
+                  >
+                    Save
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Search Bar */}
@@ -128,18 +178,6 @@ const Navbar = () => {
               </div>
             </div>
 
-            {/* Language Selector */}
-            <div className="flex items-center p-2 hover:border hover:border-white hover:rounded cursor-pointer">
-              <div className="flex flex-col items-center">
-                <img 
-                  src="https://flagcdn.com/w20/in.png" 
-                  alt="India" 
-                  className="w-5 h-3 mb-1"
-                />
-                <span className="text-sm font-bold">EN</span>
-              </div>
-            </div>
-
             {/* Account & Lists */}
             <div
               ref={accountRef}
@@ -148,7 +186,9 @@ const Navbar = () => {
               onMouseLeave={handleAccountMouseLeave}
             >
               <div className="flex flex-col p-2 hover:border hover:border-white hover:rounded cursor-pointer">
-                <span className="text-xs">Hello, sign in</span>
+                <span className="text-xs">
+                  Hello, {user ? user.displayName || user.email : 'Sign in'}
+                </span>
                 <span className="text-sm font-bold">Account & Lists</span>
               </div>
 
@@ -159,7 +199,7 @@ const Navbar = () => {
                   onMouseEnter={handleAccountMouseEnter}
                   onMouseLeave={handleAccountMouseLeave}
                 >
-                  <AccountPopup />
+                  <AccountPopup user={user} handleSignOut={handleSignOut} />
                 </div>
               )}
             </div>

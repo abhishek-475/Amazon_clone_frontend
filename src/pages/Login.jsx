@@ -1,48 +1,71 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { 
-  signInWithEmailAndPassword, 
-  signInWithRedirect, 
-  getRedirectResult 
-} from "firebase/auth";
-import { auth, googleProvider } from "../firebase"; 
-
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../firebase";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // Handle Google redirect result
-useEffect(() => {
-  getRedirectResult(auth)
-    .then((result) => {
-      if (result) {
-        navigate("/");
-      }
-    })
-    .catch((error) => console.error(error));
-}, [navigate]);
-
-
-  const handleEmailLogin = async (e) => {
-    e.preventDefault();
+  const handleGoogleLogin = async () => {
+    setError("");
+    setLoading(true);
+    const provider = new GoogleAuthProvider();
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate("/");
-    } catch (error) {
-      alert(error.message);
+      await signInWithPopup(auth, provider);
+
+      // Send user info to backend
+      const user = auth.currentUser;
+      await fetch("https://amazon-clone-backend-1-s6de.onrender.com/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: user.displayName || "Anonymous",
+          email: user.email,
+          googleId: user.providerData[0]?.uid || "",
+          authProvider: "google",
+        }),
+      });
+
+      navigate("/"); // redirect to home
+    } catch (err) {
+      console.error("Google login failed:", err);
+      setError("Google login failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleGoogleLogin = async() => {
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
     try {
-    const result = await signInWithPopup(auth, googleProvider);
-    // Optional: const user = result.user;
-    navigate("/"); // only navigate after successful login
-  } catch (error) {
-    alert(error.message);
-  }
+      await signInWithEmailAndPassword(auth, email, password);
+
+      // Send user info to backend
+      const user = auth.currentUser;
+      await fetch("https://amazon-clone-backend-1-s6de.onrender.com/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: user.displayName || "Anonymous",
+          email: user.email,
+          googleId: "",
+          authProvider: "email",
+        }),
+      });
+
+      navigate("/"); // redirect to home
+    } catch (err) {
+      console.error("Login failed:", err);
+      setError("Invalid email or password. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -63,36 +86,42 @@ useEffect(() => {
       <div className="border border-gray-300 rounded-md w-96 bg-white p-6 shadow-sm">
         <h1 className="text-2xl font-semibold mb-4">Sign in</h1>
 
-        <form onSubmit={handleEmailLogin}>
+        {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
+
+        <form onSubmit={handleLogin}>
           <label className="text-sm font-semibold block mb-1">
             Email or mobile phone number
           </label>
           <input
             type="email"
-            id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full border border-gray-400 rounded-sm p-2 mb-4 focus:outline-none focus:ring-1 focus:ring-yellow-500"
             required
           />
 
+          <label className="text-sm font-semibold block mb-1">Password</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full border border-gray-400 rounded-sm p-2 mb-4 focus:outline-none focus:ring-1 focus:ring-yellow-500"
+            required
+          />
+
           <button
             type="submit"
-            className="w-full bg-yellow-400 hover:bg-yellow-500 text-sm font-medium py-2 rounded-sm"
+            disabled={loading}
+            className={`w-full ${loading ? "bg-gray-400" : "bg-yellow-400 hover:bg-yellow-500"} text-sm font-medium py-2 rounded-sm transition-colors`}
           >
-            Continue
+            {loading ? "Signing in..." : "Continue"}
           </button>
         </form>
 
         <p className="text-xs text-gray-700 mt-4">
           By continuing, you agree to Amazon's{" "}
-          <a href="#" className="text-blue-600 hover:underline">
-            Conditions of Use
-          </a>{" "}
-          and{" "}
-          <a href="#" className="text-blue-600 hover:underline">
-            Privacy Notice
-          </a>.
+          <a href="#" className="text-blue-600 hover:underline">Conditions of Use</a> and{" "}
+          <a href="#" className="text-blue-600 hover:underline">Privacy Notice</a>.
         </p>
 
         <details className="text-sm mt-3 cursor-pointer">
@@ -139,6 +168,7 @@ useEffect(() => {
         </div>
         <button
           onClick={handleGoogleLogin}
+          disabled={loading}
           className="w-full mt-3 flex items-center justify-center border border-gray-400 rounded-sm py-2 hover:bg-gray-100"
         >
           <img
@@ -146,24 +176,18 @@ useEffect(() => {
             alt="Google"
             className="w-5 h-5 mr-2"
           />
-          <span className="text-sm">Login with Google</span>
+          <span className="text-sm">{loading ? "Signing in..." : "Login with Google"}</span>
         </button>
       </div>
 
       {/* Footer */}
       <footer className="mt-12 text-xs text-gray-500 text-center">
         <div className="flex justify-center space-x-6">
-          <a href="#" className="hover:underline">
-            Conditions of Use
-          </a>
-          <a href="#" className="hover:underline">
-            Privacy Notice
-          </a>
-          <a href="#" className="hover:underline">
-            Help
-          </a>
+          <a href="#" className="hover:underline">Conditions of Use</a>
+          <a href="#" className="hover:underline">Privacy Notice</a>
+          <a href="#" className="hover:underline">Help</a>
         </div>
-        <p className="mt-2">© 1996-2024, Amazon.com, Inc. or its affiliates</p>
+        <p className="mt-2">© 1996-2025, Amazon.com, Inc. or its affiliates</p>
       </footer>
     </div>
   );

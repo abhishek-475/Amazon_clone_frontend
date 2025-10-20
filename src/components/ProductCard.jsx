@@ -158,7 +158,7 @@ const ProductCard = ({ product }) => {
           Add to Cart
         </button>
 
-        <button
+        {/* <button
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -168,7 +168,7 @@ const ProductCard = ({ product }) => {
           className="w-full bg-orange-400 hover:bg-orange-500 text-white font-semibold py-2 px-4 rounded-lg text-sm transition-colors duration-200 border border-orange-500"
         >
           Buy Now
-        </button>
+        </button> */}
       </div>
     </div>
   );

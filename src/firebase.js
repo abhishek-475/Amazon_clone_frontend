@@ -8,8 +8,7 @@ const firebaseConfig = {
   projectId: "clone-caea2",
   storageBucket: "clone-caea2.firebasestorage.app",
   messagingSenderId: "924342453823",
-  appId: "1:924342453823:web:b093fbd014473545a69a8a",
-  measurementId: "G-0HLCCVPF9N"
+  appId: "1:924342453823:web:b093fbd014473545a69a8a"
 };
 
 const app = initializeApp(firebaseConfig);
