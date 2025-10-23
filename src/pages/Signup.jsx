@@ -11,21 +11,21 @@ const Signup = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleGoogleSignup = async () => {
+  const handleGoogleAuth = async () => {
     setError("");
     setLoading(true);
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
 
-      const user = auth.currentUser;
       await fetch("https://amazon-clone-backend-1-s6de.onrender.com/api/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: user.displayName || "Anonymous",
           email: user.email,
-          googleId: user.providerData[0]?.uid || "",
+          googleId: user.uid,
           authProvider: "google",
         }),
       });
@@ -141,9 +141,9 @@ const Signup = () => {
 
       {/* Google Signup */}
       <button
-        onClick={handleGoogleSignup}
+        onClick={handleGoogleAuth}
         disabled={loading}
-        className={`w-full max-w-md mt-3 flex items-center justify-center border border-gray-400 rounded-sm py-2 ${loading ? "bg-gray-100" : "hover:bg-gray-100"} transition-colors`}
+        className={`w-full max-w-md mt-3 flex items-center justify-center border border-gray-400 rounded-sm py-2 hover:bg-gray-100`}
       >
         <img
           src="https://www.svgrepo.com/show/475656/google-color.svg"

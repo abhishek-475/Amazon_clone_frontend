@@ -10,22 +10,21 @@ const Login = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleGoogleLogin = async () => {
+  const handleGoogleAuth = async () => {
     setError("");
     setLoading(true);
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
 
-      // Send user info to backend
-      const user = auth.currentUser;
       await fetch("https://amazon-clone-backend-1-s6de.onrender.com/api/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: user.displayName || "Anonymous",
           email: user.email,
-          googleId: user.providerData[0]?.uid || "",
+          googleId: user.uid,
           authProvider: "google",
         }),
       });
@@ -46,7 +45,6 @@ const Login = () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
 
-      // Send user info to backend
       const user = auth.currentUser;
       await fetch("https://amazon-clone-backend-1-s6de.onrender.com/api/users", {
         method: "POST",
@@ -69,7 +67,7 @@ const Login = () => {
   };
 
   return (
-    <div className="flex flex-col items-center mt-10 font-sans">
+    <div className="flex flex-col items-center mt-10 font-sans px-4">
       {/* Amazon Logo */}
       <div className="flex items-end mb-6">
         <Link to="/" className="flex items-end">
@@ -83,7 +81,7 @@ const Login = () => {
       </div>
 
       {/* Login Card */}
-      <div className="border border-gray-300 rounded-md w-96 bg-white p-6 shadow-sm">
+      <div className="border border-gray-300 rounded-md w-full max-w-md bg-white p-6 shadow-sm">
         <h1 className="text-2xl font-semibold mb-4">Sign in</h1>
 
         {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
@@ -145,7 +143,7 @@ const Login = () => {
       </div>
 
       {/* Divider */}
-      <div className="flex items-center justify-center w-96 mt-6">
+      <div className="flex items-center justify-center w-full max-w-md mt-6">
         <div className="flex-grow h-px bg-gray-300"></div>
         <span className="mx-2 text-gray-500 text-sm">New to Amazon?</span>
         <div className="flex-grow h-px bg-gray-300"></div>
@@ -154,20 +152,20 @@ const Login = () => {
       {/* Create Account */}
       <Link
         to="/signup"
-        className="border border-gray-400 bg-gray-50 hover:bg-gray-100 text-sm w-96 mt-3 py-2 rounded-sm text-center"
+        className="border border-gray-400 bg-gray-50 hover:bg-gray-100 text-sm w-full max-w-md mt-3 py-2 rounded-sm text-center"
       >
         Create your Amazon account
       </Link>
 
       {/* OR Google Login */}
-      <div className="w-96 mt-4 text-center">
+      <div className="w-full max-w-md mt-4 text-center">
         <div className="flex items-center justify-center">
           <div className="h-px bg-gray-300 w-full"></div>
           <span className="text-gray-500 mx-2 text-sm">or</span>
           <div className="h-px bg-gray-300 w-full"></div>
         </div>
         <button
-          onClick={handleGoogleLogin}
+          onClick={handleGoogleAuth}
           disabled={loading}
           className="w-full mt-3 flex items-center justify-center border border-gray-400 rounded-sm py-2 hover:bg-gray-100"
         >
