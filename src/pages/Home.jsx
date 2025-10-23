@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ProductCard from "../components/ProductCard";
 import Navbar from "../components/Layout/Navbar";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   const [products, setProducts] = useState([]);
@@ -439,6 +440,34 @@ const Home = () => {
             </div>
           </div>
         </main>
+      </div>
+
+      {/* Mobile Sign In Section - Only shows on screens less than 600px */}
+      <div className="sm:hidden bg-white border-t border-gray-200 sticky bottom-0 z-30">
+        <div className="px-4 py-3">
+          <div className="text-center mb-2">
+            <p className="text-sm text-gray-600">
+              See personalized recommendations
+            </p>
+          </div>
+          <Link 
+            to="/login"
+            className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold py-2 px-4 rounded-md text-sm transition-colors duration-200 block text-center"
+          >
+            Sign in
+          </Link>
+          <div className="text-center mt-2">
+            <span className="text-xs text-gray-500">
+              New customer?{" "}
+              <Link 
+                to="/login" 
+                className="text-blue-600 hover:text-blue-800 text-xs font-medium"
+              >
+                Start here.
+              </Link>
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );

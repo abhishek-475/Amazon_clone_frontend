@@ -5,13 +5,12 @@ import { useSelector } from "react-redux";
 const Header = () => {
   const cart = useSelector((state) => state.cart);
   const cartItemsCount = cart.items.reduce((total, item) => total + item.quantity, 0);
-
   const user = useSelector((state) => state.auth.user);
 
   return (
     <header className="bg-[#131921] sticky top-0 z-50 text-white">
       <div className="max-w-[1500px] mx-auto flex items-center justify-between px-2 sm:px-4 py-2 flex-wrap sm:flex-nowrap">
-        
+
         {/* ---------- Logo ---------- */}
         <Link
           to="/"
@@ -60,18 +59,18 @@ const Header = () => {
         </div>
 
         {/* ---------- Account & Lists ---------- */}
-        <div className="hidden sm:flex flex-col cursor-pointer px-2 hover:outline hover:outline-1 hover:outline-white rounded-sm p-1">
+        <div className="flex flex-col cursor-pointer px-2 hover:outline hover:outline-1 hover:outline-white rounded-sm p-1 text-center sm:text-left">
           <span className="text-xs text-gray-300">
             {user ? `Hello, ${user.name}` : "Hello, sign in"}
           </span>
-          <div className="flex items-center">
+          <div className="flex items-center justify-center sm:justify-start">
             <span className="text-sm font-semibold text-white">Account & Lists</span>
             <i className="fas fa-chevron-down text-gray-400 text-xs ml-1"></i>
           </div>
         </div>
 
         {/* ---------- Returns & Orders ---------- */}
-        <div className="hidden sm:flex flex-col cursor-pointer px-2 hover:outline hover:outline-1 hover:outline-white rounded-sm p-1">
+        <div className="flex flex-col cursor-pointer px-2 hover:outline hover:outline-1 hover:outline-white rounded-sm p-1 text-center sm:text-left">
           <span className="text-xs text-gray-300">Returns</span>
           <span className="text-sm font-semibold text-white">& Orders</span>
         </div>
