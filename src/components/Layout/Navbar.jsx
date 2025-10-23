@@ -24,19 +24,13 @@ const Navbar = () => {
   const accountHoverTimeout = useRef(null);
   const kitchenHoverTimeout = useRef(null);
 
-  // Track Firebase auth state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-      } else {
-        setUser(null);
-      }
+      setUser(currentUser || null);
     });
     return () => unsubscribe();
   }, []);
 
-  // Handle hover for Account popup
   const handleAccountMouseEnter = () => {
     if (accountHoverTimeout.current) clearTimeout(accountHoverTimeout.current);
     setShowAccountPopup(true);
@@ -45,7 +39,6 @@ const Navbar = () => {
     accountHoverTimeout.current = setTimeout(() => setShowAccountPopup(false), 200);
   };
 
-  // Handle hover for Kitchen mega menu
   const handleKitchenMouseEnter = () => {
     if (kitchenHoverTimeout.current) clearTimeout(kitchenHoverTimeout.current);
     setShowKitchenMenu(true);
@@ -71,8 +64,9 @@ const Navbar = () => {
     <>
       {/* Top Navigation Bar */}
       <div className="bg-[#131921] text-white sticky top-0 z-50">
-        <div className="max-w-[1500px] mx-auto px-4">
-          <div className="flex items-center h-14 gap-2">
+        <div className="max-w-[1500px] mx-auto px-2 sm:px-4">
+          <div className="flex items-center h-14 gap-2 flex-wrap sm:flex-nowrap">
+
             {/* Logo */}
             <Link to="/" className="p-2 hover:border hover:border-white hover:rounded">
               <img
@@ -82,8 +76,8 @@ const Navbar = () => {
               />
             </Link>
 
-            {/* Delivery Location */}
-            <div className="flex items-center p-2 hover:border hover:border-white hover:rounded cursor-pointer relative">
+            {/* Delivery Location (hidden <600px) */}
+            <div className="hidden sm:flex items-center p-2 hover:border hover:border-white hover:rounded cursor-pointer relative">
               <div className="flex flex-col">
                 <span className="text-xs text-gray-300 leading-3">Delivering to</span>
                 <span
@@ -103,7 +97,7 @@ const Navbar = () => {
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     placeholder="Enter city or pincode"
-                    className="border border-gray-300 rounded p-1 text-sm w-48"
+                    className="border border-gray-300 rounded p-1 text-sm w-40 sm:w-48"
                   />
                   <button
                     onClick={saveLocation}
@@ -116,61 +110,20 @@ const Navbar = () => {
             </div>
 
             {/* Search Bar */}
-            <div className="flex flex-1 max-w-2xl">
+            <div className="flex flex-1 max-w-full sm:max-w-2xl">
               <div className="flex w-full h-10">
-                <select className="bg-gray-100 text-gray-700 border border-gray-300 rounded-l-md px-2 py-1 text-xs focus:outline-none hover:bg-gray-200 border-r-0">
+                <select className="hidden sm:block bg-gray-100 text-gray-700 border border-gray-300 rounded-l-md px-2 py-1 text-xs focus:outline-none hover:bg-gray-200 border-r-0">
                   <option>All</option>
-                  <option>Alexa Skills</option>
                   <option>Amazon Devices</option>
-                  <option>Amazon Fashion</option>
-                  <option>Amazon Fresh</option>
-                  <option>Amazon Pharmacy</option>
-                  <option>Appliances</option>
-                  <option>Apps & Games</option>
-                  <option>Audible Audiobooks</option>
-                  <option>Baby</option>
-                  <option>Beauty</option>
-                  <option>Books</option>
-                  <option>Car & Motorbike</option>
-                  <option>Clothing & Accessories</option>
-                  <option>Collectibles</option>
-                  <option>Computers & Accessories</option>
-                  <option>Deals</option>
                   <option>Electronics</option>
-                  <option>Furniture</option>
-                  <option>Garden & Outdoors</option>
-                  <option>Gift Cards</option>
-                  <option>Grocery & Gourmet Foods</option>
-                  <option>Health & Personal Care</option>
-                  <option>Home & Kitchen</option>
-                  <option>Industrial & Scientific</option>
-                  <option>Jewellery</option>
-                  <option>Kindle Store</option>
-                  <option>Luggage & Bags</option>
-                  <option>Luxury Beauty</option>
-                  <option>Movies & TV Shows</option>
-                  <option>Music</option>
-                  <option>Musical Instruments</option>
-                  <option>Office Products</option>
-                  <option>Pet Supplies</option>
-                  <option>Prime Video</option>
-                  <option>Same-day Delivery</option>
-                  <option>Shoes & Handbags</option>
-                  <option>Software</option>
-                  <option>Sports, Fitness & Outdoors</option>
-                  <option>Subscribe & Save</option>
-                  <option>Tools & Home Improvement</option>
-                  <option>Toys & Games</option>
-                  <option>Under ₹500</option>
-                  <option>Video Games</option>
-                  <option>Watches</option>
+                  <option>Fashion</option>
                 </select>
                 <input
                   type="text"
                   placeholder="Search Amazon.in"
-                  className="flex-1 px-3 py-1 border-y border-gray-300 focus:outline-none text-sm text-black w-full"
+                  className="flex-1 px-2 sm:px-3 py-1 border border-gray-300 focus:outline-none text-sm text-black w-full rounded-md sm:rounded-none sm:rounded-l-md"
                 />
-                <button className="bg-[#febd69] hover:bg-[#f3a847] text-gray-900 rounded-r-md px-4 transition-colors">
+                <button className="bg-[#febd69] hover:bg-[#f3a847] text-gray-900 rounded-r-md px-3 sm:px-4 transition-colors">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
@@ -181,7 +134,7 @@ const Navbar = () => {
             {/* Account & Lists */}
             <div
               ref={accountRef}
-              className="relative"
+              className="hidden sm:block relative"
               onMouseEnter={handleAccountMouseEnter}
               onMouseLeave={handleAccountMouseLeave}
             >
@@ -204,8 +157,8 @@ const Navbar = () => {
               )}
             </div>
 
-            {/* Returns & Orders */}
-            <div className="flex flex-col p-2 hover:border hover:border-white hover:rounded cursor-pointer">
+            {/* Returns & Orders (hidden <600px) */}
+            <div className="hidden sm:flex flex-col p-2 hover:border hover:border-white hover:rounded cursor-pointer">
               <span className="text-xs">Returns</span>
               <span className="text-sm font-bold">& Orders</span>
             </div>
@@ -220,7 +173,6 @@ const Navbar = () => {
                   {cartItemsCount}
                 </span>
               </div>
-              <span className="text-sm font-bold mt-5">Cart</span>
             </Link>
           </div>
         </div>
@@ -228,8 +180,8 @@ const Navbar = () => {
 
       {/* Secondary Navigation Bar */}
       <div className="bg-[#232f3e] text-white sticky top-14 z-40">
-        <div className="max-w-[1500px] mx-auto px-4">
-          <div className="flex items-center h-10 text-sm overflow-x-auto scrollbar-hide">
+        <div className="max-w-[1500px] mx-auto px-2 sm:px-4">
+          <div className="flex items-center h-10 text-sm overflow-x-auto scrollbar-hide whitespace-nowrap">
 
             {/* All Menu */}
             <div className="flex items-center p-2 hover:border hover:border-white hover:rounded cursor-pointer whitespace-nowrap">
@@ -249,7 +201,7 @@ const Navbar = () => {
             {/* Home & Kitchen Mega Menu */}
             <div
               ref={kitchenRef}
-              className="relative"
+              className="hidden sm:block relative"
               onMouseEnter={handleKitchenMouseEnter}
               onMouseLeave={handleKitchenMouseLeave}
             >
