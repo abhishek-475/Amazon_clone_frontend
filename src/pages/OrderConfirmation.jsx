@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
+import Navbar from '../components/Layout/Navbar'; // Import Navbar
 
 const OrderConfirmation = () => {
   const location = useLocation();
@@ -17,8 +18,9 @@ const OrderConfirmation = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto px-2 sm:px-4 pt-16 sm:pt-20">
+    <div className="min-h-screen bg-white flex flex-col">
+      <Navbar /> {/* Add Navbar here */}
+      <div className="flex-1 max-w-4xl mx-auto px-2 sm:px-4 pt-4">
         {/* Success Header */}
         <div className="text-center mb-6 sm:mb-8">
           <div className="flex justify-center mb-4">

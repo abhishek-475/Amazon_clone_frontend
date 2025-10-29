@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
+import Navbar from '../components/Layout/Navbar'; // Import Navbar
 
 const Checkout = () => {
   const cart = useSelector(state => state.cart);
@@ -44,8 +45,9 @@ const Checkout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-6xl mx-auto px-4 pt-20">
+    <div className="min-h-screen bg-white flex flex-col">
+      <Navbar /> {/* Add Navbar here */}
+      <div className="flex-1 max-w-6xl mx-auto px-4 pt-4">
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-normal text-gray-900">Checkout</h1>

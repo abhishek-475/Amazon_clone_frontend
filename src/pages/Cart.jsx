@@ -7,6 +7,7 @@ import {
   clearCart,
   addToCart,
 } from "../store/cartSlice";
+import Navbar from "../components/Layout/Navbar"; // Import Navbar
 
 const Cart = () => {
   const cart = useSelector((state) => state.cart);
@@ -63,48 +64,52 @@ const Cart = () => {
 
   if (cart.items.length === 0 && savedForLater.length === 0) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <svg
-            className="w-20 h-20 mx-auto text-gray-300 mb-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1}
-              d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5.5M7 13l2.5 5.5m5.5 0a2 2 0 100-4 2 2 0 000 4zm-8 0a2 2 0 100-4 2 2 0 000 4z"
-            />
-          </svg>
-          <h1 className="text-xl sm:text-2xl font-normal text-gray-900 mb-3">
-            Your Amazon Cart is empty
-          </h1>
-          <p className="text-gray-600 mb-6 text-sm sm:text-base">
-            Continue shopping on the{" "}
+      <div className="min-h-screen bg-white flex flex-col">
+        <Navbar /> {/* Add Navbar here */}
+        <div className="flex-1 flex items-center justify-center px-4">
+          <div className="text-center max-w-md">
+            <svg
+              className="w-20 h-20 mx-auto text-gray-300 mb-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1}
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5.5M7 13l2.5 5.5m5.5 0a2 2 0 100-4 2 2 0 000 4zm-8 0a2 2 0 100-4 2 2 0 000 4z"
+              />
+            </svg>
+            <h1 className="text-xl sm:text-2xl font-normal text-gray-900 mb-3">
+              Your Amazon Cart is empty
+            </h1>
+            <p className="text-gray-600 mb-6 text-sm sm:text-base">
+              Continue shopping on the{" "}
+              <Link
+                to="/"
+                className="text-blue-600 hover:text-orange-700 hover:underline"
+              >
+                Amazon.in homepage
+              </Link>
+              .
+            </p>
             <Link
               to="/"
-              className="text-blue-600 hover:text-orange-700 hover:underline"
+              className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-medium py-2 px-6 rounded-md border border-yellow-400 shadow-sm text-sm sm:text-base"
             >
-              Amazon.in homepage
+              Shop today's deals
             </Link>
-            .
-          </p>
-          <Link
-            to="/"
-            className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-medium py-2 px-6 rounded-md border border-yellow-400 shadow-sm text-sm sm:text-base"
-          >
-            Shop today's deals
-          </Link>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-6xl mx-auto px-3 sm:px-6 pt-20">
+    <div className="min-h-screen bg-white flex flex-col">
+      <Navbar /> {/* Add Navbar here */}
+      <div className="flex-1 max-w-6xl mx-auto px-3 sm:px-6 pt-4">
         {/* Header */}
         <div className="mb-5">
           <h1 className="text-xl sm:text-3xl font-normal text-gray-900">

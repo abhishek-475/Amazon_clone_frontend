@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import Navbar from '../components/Layout/Navbar'; // Import Navbar
 
 const YourOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -169,8 +170,9 @@ const YourOrders = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white pt-20">
-        <div className="max-w-6xl mx-auto px-4">
+      <div className="min-h-screen bg-white flex flex-col">
+        <Navbar /> {/* Add Navbar here */}
+        <div className="flex-1 max-w-6xl mx-auto px-4 pt-4">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
             <div className="space-y-4">
@@ -189,8 +191,9 @@ const YourOrders = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-6xl mx-auto px-4 pt-20">
+    <div className="min-h-screen bg-white flex flex-col">
+      <Navbar /> {/* Add Navbar here */}
+      <div className="flex-1 max-w-6xl mx-auto px-4 pt-4">
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-normal text-gray-900 mb-4">Your Orders</h1>

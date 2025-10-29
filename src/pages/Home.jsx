@@ -5,6 +5,7 @@ import Navbar from "../components/Layout/Navbar";
 import { Link } from "react-router-dom";
 
 const Home = () => {
+  // State declarations
   const [products, setProducts] = useState([]);
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -19,41 +20,39 @@ const Home = () => {
     sortBy: "featured",
   });
 
+  // Banner data
   const banners = [
     {
       id: 1,
-      image:
-        "https://images.unsplash.com/photo-1607082350899-7e105aa886ae?w=1500&h=400&fit=crop",
+      image: "https://images.unsplash.com/photo-1607082350899-7e105aa886ae?w=1500&h=400&fit=crop",
       title: "Great Indian Festival",
       subtitle: "Up to 70% off | Electronics, Fashion & more",
       buttonText: "Shop now",
     },
     {
       id: 2,
-      image:
-        "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1500&h=400&fit=crop",
+      image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1500&h=400&fit=crop",
       title: "Deals on Smartphones",
       subtitle: "Latest launches from Apple, Samsung & more",
       buttonText: "See deals",
     },
     {
       id: 3,
-      image:
-        "https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=1500&h=400&fit=crop",
+      image: "https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=1500&h=400&fit=crop",
       title: "Home & Kitchen Essentials",
       subtitle: "Up to 50% off on appliances & cookware",
       buttonText: "Explore",
     },
     {
       id: 4,
-      image:
-        "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1500&h=400&fit=crop",
+      image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1500&h=400&fit=crop",
       title: "Fashion Sale",
       subtitle: "Trending styles for men & women",
       buttonText: "Discover",
     },
   ];
 
+  // Effects
   useEffect(() => {
     fetchProducts();
     const interval = setInterval(() => {
@@ -70,14 +69,13 @@ const Home = () => {
       setFeaturedProducts(featured);
 
       const uniqueCategories = [
-        ...new Set(
-          products.filter((p) => p.category).map((p) => p.category)
-        ),
+        ...new Set(products.filter((p) => p.category).map((p) => p.category)),
       ];
       setCategories(uniqueCategories);
     }
   }, [products]);
 
+  // API call
   const fetchProducts = async () => {
     try {
       setLoading(true);
@@ -92,42 +90,41 @@ const Home = () => {
     }
   };
 
-  const nextSlide = () =>
-    setCurrentSlide((prev) => (prev + 1) % banners.length);
-  const prevSlide = () =>
-    setCurrentSlide((prev) => (prev - 1 + banners.length) % banners.length);
+  // Carousel handlers
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % banners.length);
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + banners.length) % banners.length);
   const goToSlide = (index) => setCurrentSlide(index);
 
-  const handleFilterChange = (key, value) =>
-    setFilters((prev) => ({ ...prev, [key]: value }));
-  const clearFilters = () =>
-    setFilters({
-      category: "",
-      minPrice: "",
-      maxPrice: "",
-      rating: "",
-      sortBy: "featured",
-    });
+  // Filter handlers
+  const handleFilterChange = (key, value) => setFilters((prev) => ({ ...prev, [key]: value }));
+  
+  const clearFilters = () => setFilters({
+    category: "",
+    minPrice: "",
+    maxPrice: "",
+    rating: "",
+    sortBy: "featured",
+  });
 
+  // Product filtering and sorting
   const getFilteredProducts = (productList) => {
     let filtered = [...productList];
-    if (filters.category)
-      filtered = filtered.filter(
-        (product) => product.category === filters.category
-      );
-    if (filters.minPrice)
-      filtered = filtered.filter(
-        (product) => product.price >= parseInt(filters.minPrice)
-      );
-    if (filters.maxPrice)
-      filtered = filtered.filter(
-        (product) => product.price <= parseInt(filters.maxPrice)
-      );
-    if (filters.rating)
-      filtered = filtered.filter(
-        (product) => product.rating >= parseInt(filters.rating)
-      );
+    
+    // Apply filters
+    if (filters.category) {
+      filtered = filtered.filter((product) => product.category === filters.category);
+    }
+    if (filters.minPrice) {
+      filtered = filtered.filter((product) => product.price >= parseInt(filters.minPrice));
+    }
+    if (filters.maxPrice) {
+      filtered = filtered.filter((product) => product.price <= parseInt(filters.maxPrice));
+    }
+    if (filters.rating) {
+      filtered = filtered.filter((product) => product.rating >= parseInt(filters.rating));
+    }
 
+    // Apply sorting
     switch (filters.sortBy) {
       case "price-low":
         filtered.sort((a, b) => a.price - b.price);
@@ -139,16 +136,16 @@ const Home = () => {
         filtered.sort((a, b) => b.rating - a.rating);
         break;
       case "newest":
-        filtered.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
+        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         break;
       default:
         break;
     }
+    
     return filtered;
   };
 
+  // Loading state
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex flex-col">
@@ -196,36 +193,16 @@ const Home = () => {
           onClick={prevSlide}
           className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full w-7 h-7 sm:w-10 sm:h-10 flex items-center justify-center"
         >
-          <svg
-            className="w-4 h-4 sm:w-6 sm:h-6 text-gray-800"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
+          <svg className="w-4 h-4 sm:w-6 sm:h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
         <button
           onClick={nextSlide}
           className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full w-7 h-7 sm:w-10 sm:h-10 flex items-center justify-center"
         >
-          <svg
-            className="w-4 h-4 sm:w-6 sm:h-6 text-gray-800"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
+          <svg className="w-4 h-4 sm:w-6 sm:h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
       </div>
@@ -236,18 +213,8 @@ const Home = () => {
           onClick={() => setShowFilters(!showFilters)}
           className="w-full flex items-center justify-center space-x-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
         >
-          <svg
-            className="w-5 h-5 text-gray-600"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M3 4h18M3 12h18M3 20h18"
-            />
+          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M3 12h18M3 20h18" />
           </svg>
           <span>{showFilters ? "Close Filters" : "Filters & Sort"}</span>
         </button>
@@ -284,9 +251,7 @@ const Home = () => {
               <h4 className="text-sm font-medium mb-2">Sort By</h4>
               <select
                 value={filters.sortBy}
-                onChange={(e) =>
-                  handleFilterChange("sortBy", e.target.value)
-                }
+                onChange={(e) => handleFilterChange("sortBy", e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-yellow-400"
               >
                 <option value="featured">Featured</option>
@@ -307,9 +272,7 @@ const Home = () => {
                     name="category"
                     value=""
                     checked={filters.category === ""}
-                    onChange={(e) =>
-                      handleFilterChange("category", e.target.value)
-                    }
+                    onChange={(e) => handleFilterChange("category", e.target.value)}
                     className="text-yellow-400"
                   />
                   <span className="ml-2">All</span>
@@ -321,9 +284,7 @@ const Home = () => {
                       name="category"
                       value={category}
                       checked={filters.category === category}
-                      onChange={(e) =>
-                        handleFilterChange("category", e.target.value)
-                      }
+                      onChange={(e) => handleFilterChange("category", e.target.value)}
                       className="text-yellow-400"
                     />
                     <span className="ml-2">{category}</span>
@@ -340,18 +301,14 @@ const Home = () => {
                   type="number"
                   placeholder="Min"
                   value={filters.minPrice}
-                  onChange={(e) =>
-                    handleFilterChange("minPrice", e.target.value)
-                  }
+                  onChange={(e) => handleFilterChange("minPrice", e.target.value)}
                   className="w-1/2 border rounded-lg px-2 py-1.5 text-sm focus:ring-2 focus:ring-yellow-400"
                 />
                 <input
                   type="number"
                   placeholder="Max"
                   value={filters.maxPrice}
-                  onChange={(e) =>
-                    handleFilterChange("maxPrice", e.target.value)
-                  }
+                  onChange={(e) => handleFilterChange("maxPrice", e.target.value)}
                   className="w-1/2 border rounded-lg px-2 py-1.5 text-sm focus:ring-2 focus:ring-yellow-400"
                 />
               </div>
@@ -368,17 +325,12 @@ const Home = () => {
                       name="rating"
                       value={rating}
                       checked={filters.rating === rating.toString()}
-                      onChange={(e) =>
-                        handleFilterChange("rating", e.target.value)
-                      }
+                      onChange={(e) => handleFilterChange("rating", e.target.value)}
                       className="text-yellow-400"
                     />
                     <span className="ml-2">
                       {"★".repeat(rating)}
-                      <span className="text-gray-400">
-                        {"★".repeat(5 - rating)}
-                      </span>{" "}
-                      & up
+                      <span className="text-gray-400">{"★".repeat(5 - rating)}</span> & up
                     </span>
                   </label>
                 ))}
@@ -399,7 +351,7 @@ const Home = () => {
 
         {/* Products Section */}
         <main className="flex-1">
-          {/* Featured */}
+          {/* Featured Products */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-6 mb-6">
             <h2 className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-5">
               Featured Products
@@ -411,7 +363,7 @@ const Home = () => {
             </div>
           </div>
 
-          {/* Deals */}
+          {/* Today's Deals */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-6 mb-6">
             <h2 className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-5">
               Today's Deals
@@ -442,7 +394,7 @@ const Home = () => {
         </main>
       </div>
 
-      {/* Mobile Sign In Section - Only shows on screens less than 600px */}
+      {/* Mobile Sign In Section */}
       <div className="sm:hidden bg-white border-t border-gray-200 sticky bottom-0 z-30">
         <div className="px-4 py-3">
           <div className="text-center mb-2">
